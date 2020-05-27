@@ -56,8 +56,8 @@ def download_and_load_datasets(force_download=False):
 
 train, test = download_and_load_datasets()
 
-train = train.sample(5000)
-test = test.sample(5000)
+train = train.sample(10000)
+test = test.sample(10000)
 
 print(train)
 
@@ -309,19 +309,28 @@ test_input_fn = run_classifier.input_fn_builder(
 
 def getPrediction(in_sentences):
     labels = ["Negative", "Positive"]
-    input_examples = [run_classifier.InputExample(guid="", text_a = x, text_b = None, label = 0) for x in in_sentences] # here, "" is just a dummy label
-    input_features = run_classifier.convert_examples_to_features(input_examples, label_list, MAX_SEQ_LENGTH, tokenizer)
-    predict_input_fn = run_classifier.input_fn_builder(features=input_features, seq_length=MAX_SEQ_LENGTH, is_training=False, drop_remainder=False)
+    input_examples = [run_classifier.InputExample(
+        guid="", text_a=x, text_b=None, label=0) for x in in_sentences]  # here, "" is just a dummy label
+    input_features = run_classifier.convert_examples_to_features(
+        input_examples, label_list, MAX_SEQ_LENGTH, tokenizer)
+    predict_input_fn = run_classifier.input_fn_builder(
+        features=input_features, seq_length=MAX_SEQ_LENGTH, is_training=False, drop_remainder=False)
     predictions = estimator.predict(predict_input_fn)
     return [(sentence, prediction['probabilities'], labels[prediction['labels']]) for sentence, prediction in zip(in_sentences, predictions)]
 
+
 pred_sentences = [
-  "That movie was absolutely awful",
-  "The acting was a bit lacking",
-  "The film was creative and surprising",
-  "Absolutely fantastic!"
+    "That movie was absolutely awful",
+    "The acting was a bit lacking",
+    "The film was creative and surprising",
+    "Absolutely fantastic!",
+    "Great detail descriptions. Thanks",
+    "It was extremely easy to set up, but that doesn’t make up for its flaws. The screen was quite bright at night. I have path light in my room that are dimmer than this clock, and it can’t be adjusted. It also is making a very loud buzzing/humming noise after only 2 days of use. I do like how easy the numbers are to see (as someone who wears contacts and can’t see alarm clocks at night easily) but it doesn’t make up for the electric buzzing it’s making.",
+    "At first, it was wonderful. It was bright but I could live with it, it was not complicated to set up and understand (at least for me) and I was even ok with the sound that’s screamed panic all over my room. I would’ve given it 5 stars if it wasn’t because this clock stopped working after 3 months. I bought it Apr. 24 and by July 23, it was already crap. It started resetting itself so now it is pretty much useless and I can no longer give it back. I wasted my money.",
+    "GREAT CHEAP CLOCK. Only issue is the buzzer. Only one level which is REALLY LOUD. I mean REALLY, REALLY LOUD. Other than that it's a great little clock."
 ]
 
 predictions = getPrediction(pred_sentences)
 
-print(predictions)
+for prediction in predictions:
+    print(prediction)
